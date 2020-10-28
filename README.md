@@ -1,2 +1,1 @@
-# WeatNet
-# Initial Commits
+# WeatNet Server Side
