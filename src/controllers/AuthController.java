@@ -1,6 +1,6 @@
 package controllers;
 
-import Auth.Authentication;
+import auth.Authentication;
 
 public class AuthController {
     private Authentication auth;
