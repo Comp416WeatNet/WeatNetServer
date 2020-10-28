@@ -9,7 +9,7 @@ import java.net.Socket;
 
 public class Server {
     private ServerSocket serverSocket;
-    public static final int DEFAULT_SERVER_PORT = 4444;
+    public static final int DEFAULT_SERVER_PORT = 9999;
 
     public Server(int port)
     {
