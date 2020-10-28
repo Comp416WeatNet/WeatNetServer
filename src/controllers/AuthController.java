@@ -4,7 +4,19 @@ import Auth.Authentication;
 
 public class AuthController {
     private Authentication auth;
-    private String GetQuestion(int number){
+
+    public AuthController() {
+        auth = new Authentication();
+    }
+
+    public String GetQuestion(int number){
         return auth.GetQuestion(number);
+    }
+    public boolean CheckAnswer(String username, int number, String answer) {
+        return auth.CheckAnswer(username, number, answer);
+    }
+
+    public String GetAnswer(String username, int number) {
+        return auth.getAnswer(username, number);
     }
 }

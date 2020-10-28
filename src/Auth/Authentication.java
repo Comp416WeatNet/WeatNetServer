@@ -13,14 +13,17 @@ public class Authentication {
     };
 
     public String GetQuestion(int number) {
-        return questions[number];
+        if (number < 1 || number > questions.length){
+            return "Please enter a number within the question range.";
+        }
+        return questions[number - 1];
     }
     public boolean CheckAnswer(String username, int number, String answer) {
-        String correctAnswer = getAnswer(username,number,answer);
-        return correctAnswer == answer;
+        String correctAnswer = getAnswer(username,number);
+        return correctAnswer.equals(answer);
     }
-    public String getAnswer(String username, int number, String answer) {
-        File answers = new File("../SecurityAnswers");
+    public String getAnswer(String username, int number) {
+        File answers = new File(System.getProperty("user.dir") + "/SecurityAnswers");
         String line;
         try {
             BufferedReader br = new BufferedReader(new FileReader(answers));
