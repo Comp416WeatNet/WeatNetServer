@@ -26,7 +26,7 @@ public class ServerThread extends Thread{
     public ServerThread(Socket s)
     {
         this.s = s;
-        authController = AuthController.getAuthController();
+        authController = new AuthController();
     }
 
     /**
@@ -47,7 +47,7 @@ public class ServerThread extends Thread{
         String token = authController.createToken();
         Result result = new Result(token, check);
         DataType dataType = result.convertToDatatype();
-        os.println("Result " + check); // send token instead
+        os.println(dataType.getData());
         os.flush();
     }
 }

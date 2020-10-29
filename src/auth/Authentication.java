@@ -37,15 +37,14 @@ public class Authentication {
         try {
             fin = new BufferedReader(new FileReader(answers));
             while ((line = fin.readLine()) != null) {
-               if(line.contains(username)) {
-                  while(line != null && !line.equals("Line end")) {
-                      question = fin.readLine();
+               if(line.equals(username)) {
+                   while((line = fin.readLine()) != null && !line.equals("Line end")) {
+                      question = line;
                       if(question.equals("Line end"))
                           break;
                       answer = fin.readLine();
                       answerMap.put(question, answer);
                   }
-                  os.println("True username");
                   return;
                }
             }
@@ -67,17 +66,21 @@ public class Authentication {
         try {
             username = is.readLine();
             resp = new DataType(username);
-            this.getAnswers(resp.getPayload());
+            username = "<" + resp.getPayload() + ">";
+            this.getAnswers(username);
             for(int i=0; i<3; i++) {
                 question = questionList.get(i);
-                os.println(new DataType(DataType.AUTH_PHASE ,DataType.AUTH_CHALLENGE ,question));
+                DataType data = new DataType(DataType.AUTH_PHASE ,DataType.AUTH_CHALLENGE ,question);
+                os.println(data.getData());
                 os.flush();
                 answer = is.readLine();
-                resp = new DataType(answer);
-                answer = resp.getPayload();
-                boolean check = checkAnswer(question, answer);
-                if (!check) {
-                    return check;
+                if(answer != null) {
+                    resp = new DataType(answer);
+                    answer = resp.getPayload();
+                    boolean check = checkAnswer(question, answer);
+                    if (!check) {
+                        return check;
+                    }
                 }
             }
         } catch (IOException e) {
