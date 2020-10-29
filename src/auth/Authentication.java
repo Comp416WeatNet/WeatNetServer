@@ -34,11 +34,15 @@ public class Authentication {
             fin = new BufferedReader(new FileReader(answers));
             while ((line = fin.readLine()) != null) {
                if(line.contains(username)) {
-                  while(line != null || !line.equals("Line end")) {
+                  while(line != null && !line.equals("Line end")) {
                       question = fin.readLine();
+                      if(question.equals("Line end"))
+                          break;
                       answer = fin.readLine();
                       answerMap.put(question, answer);
                   }
+                  System.out.println("True username");
+                  return;
                }
             }
             System.out.println("False username...");
@@ -47,18 +51,21 @@ public class Authentication {
         }
     }
 
-    public boolean Authenticate(@NotNull BufferedReader is, PrintWriter os) {
+    public boolean Authenticate(BufferedReader is, PrintWriter os) {
         List<String> questionList = Arrays.asList(questions);
         Collections.shuffle(questionList);
         String username;
         String answer;
+        String question;
         try {
             username = is.readLine();
             this.GetAnswers(username);
             for(int i=0; i<3; i++) {
+                question = questionList.get(i);
+                os.println(question);
+                os.flush();
                 answer = is.readLine();
-                boolean check = CheckAnswer(questionList.get(0), answer);
-                questionList.remove(0);
+                boolean check = CheckAnswer(question, answer);
                 if (!check) {
                     return check;
                 }

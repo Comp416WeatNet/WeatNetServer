@@ -41,8 +41,12 @@ public class ServerThread extends Thread{
         {
             System.err.println("Server Thread. Run. IO error in server thread");
         }
+        boolean check = authController.Authenticate(is, os);
+        System.out.println("Result " + check);
 
-        authController.Authenticate(is, os);
+    }
+}
+
 //        try
 //        {
 //            line = is.readLine();
@@ -94,5 +98,3 @@ public class ServerThread extends Thread{
 //                System.err.println("Socket Close Error");
 //            }
 //        }//end finally
-    }
-}
