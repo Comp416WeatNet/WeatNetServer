@@ -25,12 +25,12 @@ public class Authentication {
         answerMap = new HashMap<>();
     }
 
-    public boolean CheckAnswer(String question, String answer) {
+    public boolean checkAnswer(String question, String answer) {
         String correctAnswer = answerMap.get(question);
         return correctAnswer.equals(answer);
     }
 
-    public void GetAnswers(String username) {
+    public void getAnswers(String username) {
         String line;
         String question;
         String answer;
@@ -49,13 +49,13 @@ public class Authentication {
                   return;
                }
             }
-            this.Disconnect("Username is not existing in the database.");
+            this.disconnect("Username is not existing in the database.");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean Authenticate(BufferedReader inputStream, PrintWriter outputStream) {
+    public boolean authenticate(BufferedReader inputStream, PrintWriter outputStream) {
         this.is = inputStream;
         this.os = outputStream;
         List<String> questionList = Arrays.asList(questions);
@@ -67,7 +67,7 @@ public class Authentication {
         try {
             username = is.readLine();
             resp = new DataType(username);
-            this.GetAnswers(resp.getPayload());
+            this.getAnswers(resp.getPayload());
             for(int i=0; i<3; i++) {
                 question = questionList.get(i);
                 os.println(new DataType(DataType.AUTH_PHASE ,DataType.AUTH_CHALLENGE ,question));
@@ -75,7 +75,7 @@ public class Authentication {
                 answer = is.readLine();
                 resp = new DataType(answer);
                 answer = resp.getPayload();
-                boolean check = CheckAnswer(question, answer);
+                boolean check = checkAnswer(question, answer);
                 if (!check) {
                     return check;
                 }
@@ -86,15 +86,25 @@ public class Authentication {
         return true;
     }
 
-    private void Disconnect(String message) {
+    private void disconnect(String message) {
         Result result = new Result(message, false);
         DataType fail = result.convertToDatatype();
         try {
             os.println(fail.getData());
+            os.println("Closing the connection");
             os.flush();
-        //disconnects the connections..
-            is.close();
-            os.close();
+
+            if (is != null)
+            {
+                is.close();
+                System.err.println(" Socket Input Stream Closed");
+            }
+
+            if (os != null)
+            {
+                os.close();
+                System.err.println("Socket Out Closed");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

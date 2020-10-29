@@ -23,11 +23,11 @@ public class Server {
         }
         while (true)
         {
-            ListenAndAccept();
+            listenAndAccept();
         }
     }
 
-    private void ListenAndAccept()
+    private void listenAndAccept()
     {
         Socket s;
         try {

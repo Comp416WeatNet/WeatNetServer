@@ -43,7 +43,7 @@ public class ServerThread extends Thread{
         {
             System.err.println("Server Thread. Run. IO error in server thread");
         }
-        boolean check = authController.Authenticate(is, os);
+        boolean check = authController.authenticate(is, os);
         String token = authController.createToken();
         Result result = new Result(token, check);
         DataType dataType = result.convertToDatatype();
@@ -51,55 +51,3 @@ public class ServerThread extends Thread{
         os.flush();
     }
 }
-
-//        try
-//        {
-//            line = is.readLine();
-//            while (line.compareTo("QUIT") != 0)
-//            {
-//                lines = "Client messaged : " + line + " at  : " + Thread.currentThread().getId();
-//                os.println(lines);
-//                os.flush();
-//                System.out.println("Client " + s.getRemoteSocketAddress() + " sent :  " + lines);
-//                line = is.readLine();
-//            }
-//        }
-//        catch (IOException e)
-//        {
-//            line = this.getName(); //reused String line for getting thread name
-//            System.err.println("Server Thread. Run. IO Error/ Client " + line + " terminated abruptly");
-//        }
-//        catch (NullPointerException e)
-//        {
-//            line = this.getName(); //reused String line for getting thread name
-//            System.err.println("Server Thread. Run.Client " + line + " Closed");
-//        }
-//
-//        finally
-//        {
-//            try
-//            {
-//                System.out.println("Closing the connection");
-//                if (is != null)
-//                {
-//                    is.close();
-//                    System.err.println(" Socket Input Stream Closed");
-//                }
-//
-//                if (os != null)
-//                {
-//                    os.close();
-//                    System.err.println("Socket Out Closed");
-//                }
-//                if (s != null)
-//                {
-//                    s.close();
-//                    System.err.println("Socket Closed");
-//                }
-//
-//            }
-//            catch (IOException ie)
-//            {
-//                System.err.println("Socket Close Error");
-//            }
-//        }//end finally
