@@ -1,6 +1,5 @@
 package main;
 
-import controllers.AuthController;
 import server.Server;
 
 public class Main {

@@ -1,5 +1,6 @@
 package server;
 
+import controllers.AuthController;
 import server.ServerThread;
 
 import java.io.IOException;
@@ -32,17 +33,14 @@ public class Server {
     private void ListenAndAccept()
     {
         Socket s;
-        try
-        {
-            s = serverSocket.accept();
-            System.out.println("A connection was established with a client on the address of " + s.getRemoteSocketAddress());
-            ServerThread st = new ServerThread(s);
-            st.start();
-
+        try {
+                s = serverSocket.accept();
+                System.out.println("A connection was established with a client on the address of " + s.getRemoteSocketAddress());
+                ServerThread st = new ServerThread(s);
+                st.start();
         }
 
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace();
             System.err.println("Server Class.Connection establishment error inside listen and accept function");
         }
