@@ -10,15 +10,7 @@ public class Result {
     }
 
     public DataType convertToDatatype() {
-        DataType dataType = result ? new DataType(0x00, 0x02, message) : new DataType(0x00, 0x03, message);
+        DataType dataType = result ? new DataType(DataType.AUTH_PHASE, DataType.AUTH_FAIL, message) : new DataType(DataType.AUTH_PHASE, DataType.AUTH_SUCCESS, message);
         return dataType;
-    }
-
-    @Override
-    public String toString() {
-        return "Result{" +
-                "message='" + message + '\'' +
-                ", result=" + result +
-                '}';
     }
 }
