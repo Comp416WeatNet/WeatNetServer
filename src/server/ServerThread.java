@@ -1,6 +1,8 @@
 package server;
 
 import controllers.AuthController;
+import model.DataType;
+import model.Result;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,7 +44,10 @@ public class ServerThread extends Thread{
             System.err.println("Server Thread. Run. IO error in server thread");
         }
         boolean check = authController.Authenticate(is, os);
-        System.out.println("Result " + check);
+        String token = authController.createToken();
+        Result result = new Result(token, check);
+        DataType dataType = result.convertToDatatype();
+        os.println("Result " + check); // send token instead
 
     }
 }

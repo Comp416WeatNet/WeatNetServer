@@ -75,4 +75,8 @@ public class Authentication {
         }
         return true;
     }
+
+    public String createToken() {
+        return "token 123";
+    }
 }

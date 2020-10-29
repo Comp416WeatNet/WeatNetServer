@@ -2,8 +2,8 @@ package model;
 
 public class DataType {
     private String data;
-    private int phase;
-    private int type;
+    private int phase; // bence bunlar byte olmalı
+    private int type; // byte olması lazım
     private int size;
     private String payload;
 

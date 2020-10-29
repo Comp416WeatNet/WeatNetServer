@@ -33,4 +33,8 @@ public class AuthController {
     public boolean Authenticate(BufferedReader is, PrintWriter os) {
         return auth.Authenticate(is, os);
     }
+
+    public String createToken() {
+        return auth.createToken();
+    }
 }
