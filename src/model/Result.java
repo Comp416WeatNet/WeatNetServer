@@ -1,4 +1,4 @@
-package auth;
+package model;
 
 public class Result {
     String message;
