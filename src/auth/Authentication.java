@@ -1,11 +1,13 @@
 package auth;
 
-import org.jetbrains.annotations.NotNull;
+import model.DataType;
+import model.Result;
 
 import java.io.*;
 import java.util.*;
 
 public class Authentication {
+    private static final String DEFAULT_FILE_PATH = System.getProperty("user.dir") + "/SecurityAnswers";
     private static String[] questions = new String[] {
             "What is your favorite color?",
             "In which city, you were born?",
@@ -13,67 +15,102 @@ public class Authentication {
             "What is your favorite pet?"
     };
     private BufferedReader fin;
-    private File answers;
+    private static File answers;
     private HashMap<String, String> answerMap;
+    private BufferedReader is;
+    private PrintWriter os;
 
     public Authentication (){
-        answers = new File(System.getProperty("user.dir") + "/SecurityAnswers");
+        answers = new File(this.DEFAULT_FILE_PATH);
         answerMap = new HashMap<>();
     }
 
-    public boolean CheckAnswer(String question, String answer) {
+    public boolean checkAnswer(String question, String answer) {
         String correctAnswer = answerMap.get(question);
         return correctAnswer.equals(answer);
     }
 
-    public void GetAnswers(String username) {
+    public void getAnswers(String username) {
         String line;
         String question;
         String answer;
         try {
             fin = new BufferedReader(new FileReader(answers));
             while ((line = fin.readLine()) != null) {
-               if(line.contains(username)) {
-                  while(line != null && !line.equals("Line end")) {
-                      question = fin.readLine();
+               if(line.equals(username)) {
+                   while((line = fin.readLine()) != null && !line.equals("Line end")) {
+                      question = line;
                       if(question.equals("Line end"))
                           break;
                       answer = fin.readLine();
                       answerMap.put(question, answer);
                   }
-                  System.out.println("True username");
                   return;
                }
             }
-            System.out.println("False username...");
+            this.disconnect("Username is not existing in the database.");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean Authenticate(BufferedReader is, PrintWriter os) {
+    public boolean authenticate(BufferedReader inputStream, PrintWriter outputStream) {
+        this.is = inputStream;
+        this.os = outputStream;
         List<String> questionList = Arrays.asList(questions);
         Collections.shuffle(questionList);
         String username;
         String answer;
         String question;
+        DataType resp;
         try {
             username = is.readLine();
-            this.GetAnswers(username);
+            resp = new DataType(username);
+            username = "<" + resp.getPayload() + ">";
+            this.getAnswers(username);
             for(int i=0; i<3; i++) {
                 question = questionList.get(i);
-                os.println(question);
+                DataType data = new DataType(DataType.AUTH_PHASE ,DataType.AUTH_CHALLENGE ,question);
+                os.println(data.getData());
                 os.flush();
                 answer = is.readLine();
-                boolean check = CheckAnswer(question, answer);
-                if (!check) {
-                    return check;
+                if(answer != null) {
+                    resp = new DataType(answer);
+                    answer = resp.getPayload();
+                    boolean check = checkAnswer(question, answer);
+                    if (!check) {
+                        return check;
+                    }
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return true;
+    }
+
+    private void disconnect(String message) {
+        Result result = new Result(message, false);
+        DataType fail = result.convertToDatatype();
+        try {
+            os.println(fail.getData());
+            os.println("Closing the connection");
+            os.flush();
+
+            if (is != null)
+            {
+                is.close();
+                System.err.println(" Socket Input Stream Closed");
+            }
+
+            if (os != null)
+            {
+                os.close();
+                System.err.println("Socket Out Closed");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String createToken() {

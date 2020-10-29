@@ -1,8 +1,5 @@
 package server;
 
-import controllers.AuthController;
-import server.ServerThread;
-
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
@@ -26,11 +23,11 @@ public class Server {
         }
         while (true)
         {
-            ListenAndAccept();
+            listenAndAccept();
         }
     }
 
-    private void ListenAndAccept()
+    private void listenAndAccept()
     {
         Socket s;
         try {
