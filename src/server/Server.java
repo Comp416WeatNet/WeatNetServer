@@ -1,8 +1,5 @@
 package server;
 
-import controllers.AuthController;
-import server.ServerThread;
-
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.ServerSocket;

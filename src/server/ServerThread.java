@@ -48,7 +48,7 @@ public class ServerThread extends Thread{
         Result result = new Result(token, check);
         DataType dataType = result.convertToDatatype();
         os.println("Result " + check); // send token instead
-
+        os.flush();
     }
 }
 
