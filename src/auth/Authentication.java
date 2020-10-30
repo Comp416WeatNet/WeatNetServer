@@ -8,7 +8,7 @@ import java.util.*;
 
 public class Authentication {
     private static final String DEFAULT_FILE_PATH = System.getProperty("user.dir") + "/SecurityAnswers";
-    private static String[] questions = new String[] {
+    private static final String[] questions = new String[] {
             "What is your favorite color?",
             "In which city, you were born?",
             "What is your mother's name?",
@@ -57,7 +57,7 @@ public class Authentication {
     public boolean authenticate(BufferedReader inputStream, PrintWriter outputStream) {
         this.is = inputStream;
         this.os = outputStream;
-        List<String> questionList = Arrays.asList(questions);
+        ArrayList<String> questionList = this.toList(questions);
         Collections.shuffle(questionList);
         String username;
         String answer;
@@ -77,6 +77,7 @@ public class Authentication {
                 if(answer != null) {
                     resp = new DataType(answer);
                     answer = resp.getPayload();
+                    System.out.println("Client sent message to the " + Thread.currentThread().getId() + "th thread.");
                     boolean check = checkAnswer(question, answer);
                     if (!check) {
                         return check;
@@ -115,5 +116,13 @@ public class Authentication {
 
     public String createToken() {
         return "token 123";
+    }
+
+    public ArrayList<String> toList(String[] array){
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (String element : array){
+            arrayList.add(element);
+        }
+        return arrayList;
     }
 }
