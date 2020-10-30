@@ -32,6 +32,7 @@ public class Server {
         Socket s;
         try {
                 s = serverSocket.accept();
+//                s.setSoTimeout(10 * 1000);
                 System.out.println("A connection was established with a client on the address of " + s.getRemoteSocketAddress());
                 ServerThread st = new ServerThread(s);
                 st.start();

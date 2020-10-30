@@ -1,6 +1,7 @@
 package server;
 
 import controllers.AuthController;
+import controllers.QueryingController;
 import model.DataType;
 import model.Result;
 
@@ -17,6 +18,7 @@ public class ServerThread extends Thread{
     private String line = new String();
     private String lines = new String();
     private AuthController authController;
+    private QueryingController queryingController;
 
     /**
      * Creates a server thread on the input socket
@@ -30,7 +32,7 @@ public class ServerThread extends Thread{
     }
 
     /**
-     * The server thread, echos the client until it receives the QUIT string from the client
+     * The server thread, authenticates the client. If it recieves a false input then it breaks the connection.
      */
     public void run()
     {
@@ -49,5 +51,7 @@ public class ServerThread extends Thread{
         DataType dataType = result.convertToDatatype();
         os.println(dataType.getData());
         os.flush();
+
+
     }
 }
