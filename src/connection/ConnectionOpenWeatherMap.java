@@ -1,105 +1,95 @@
 package connection;
 
+import netscape.javascript.JSObject;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ConnectionOpenWeatherMap {
+    public static final String DEFAULT_BASE_URL = "https://api.openweathermap.org";
+    public static final String DEFAULT_CONTENT = "/data/2.5/weather?";
+    private static final String API_KEY = "8f262f416d14e54162be32e01df4a202";
 
-    private double API_VERSION = 0;
-    private String API = "";
-
-    private String METHOD  = "POST";
-    private String TYPE = "api/openweathermap.org";
+    private String METHOD = "GET";
     private String USER_AGENT = "Mozilla/5.0";
-    private String data ="";
+
+    private String baseURL;
+    private String content;
+    private String data;
     private URL connection;
     private HttpURLConnection finalConnection;
 
     private HashMap<String, String> fields = new HashMap<String, String>();
 
-    public class ConnectionOpenWeatherMap(String[] endpoint, String url, double version){
-        
-        this.API_VERSION = version;
-        this.API = url;
-        fields.put("version", String.valueOf(version));
-        for(int i=0; i<endpoint.length; i++){
-            String[] points = endpoint[i].split(,);
-            
-        }
+    public ConnectionOpenWeatherMap(String url, String content) {
+        this.baseURL = url;
+        this.content = content;
+        data = url + content;
     }
-}
 
-public String buildConnection() {
-    StringBuilding content = new StringBuilder();
-    if (!this.getEndpoints().equalsIgnoreCase("") && !this.getEndpoints().isEmpty()){
-        String vars = "";
-        String vals = "";
+    public String buildConnection(String city, String... args) {
+
+        //Building the connection
+        StringBuilder content = new StringBuilder();
+        for (String arg : args){
+            String[] params = arg.split("-");
+            fields.put(params[0], params[1]);
+        }
+        data += ("q="+city);
+        if (!this.getEndpoints().equalsIgnoreCase("") && !this.getEndpoints().isEmpty()) {
+            String vars = "";
+            String vals = "";
+            try {
+                for (Map.Entry<String, String> entry : fields.entrySet()) {
+                    vars = entry.getKey();
+                    vals = entry.getValue();
+                    data += ("&" + vars + "=" + vals);
+                }
+                data+= ("&appid=" + API_KEY);
+                connection = new URL(data);
+
+
+                //Reading the content
+                BufferedReader reader = new BufferedReader(new InputStreamReader(readWithAccess(connection)));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    content.append(line + "/n");
+                }
+                reader.close();
+                return content.toString();
+            } catch (MalformedURLException e) {
+                System.err.println("System gave the error:\n" + e.getMessage());
+            } catch (IOException e){
+                System.err.println("System gave the error:\n" + e.getMessage());
+            }
+        }
+        return "";
+    }
+
+    public String getEndpoints() {
+        return fields.toString();
+    }
+
+    private InputStream readWithAccess (URL url) {
+
         try {
-            for(Map.Entry<String, String> entry : fields.entrySet()){
-                vars = entry.getKey();
-                vals = entry.getValue();
-                data+= ("&"+vars+"="+vals);
-            }
-            connection = new URL(API);
-            BufferedReader reader = new BufferedReader (new InputStreamReader (readWithAccess));
-            String line;
-            while ((line = reader.readLine()) ! = null){
-                content.append(line + "/n");
-            }
-            reaader.close();
-            return content.toString();
-        }catch(Exception e){
-            System.err.println(e.getMessage());
-        }
-    }
-}
+            finalConnection = (HttpURLConnection) url.openConnection();
+            finalConnection.setRequestMethod(METHOD);
+            finalConnection.addRequestProperty("User-Agent",USER_AGENT);
+            finalConnection.addRequestProperty("Content-Type", "application/json");
+            finalConnection.connect();
 
-public String getApiVersion() {
-    return String.valueOf(API_VERSION);
-}
-
-public String getEndpoints() {
-    return fields.toString();
-}
-
-public String getEndpointValue(String key) {
-    return fields.get(key);
-}
-
-public void setUserAgent (String userAgent){
-    this.USER_AGENT = userAgent;
-}
-
-public void setSubmissionType (String type){
-    this.TYPE = type;
-}
-
-
-private InputStream readWithAccess (URL url, String data) {
-
-    try {
-        byte[] out = data.toString().getBytes();
-        finalConnection = (HttpURLConnection) url.openConnection();
-        finalConnection.setRequestMethod(METHOD);
-        finalConnection.setDoOutput(true);
-        finalConnection.addRequestProperty("User-Agent",USER_AGENT);
-        finalConnection.addRequestProperty("Content-Type", TYPE);
-        finalConnection.connect();
-
-        try{
-            OutputStream os = finalConnection.getOutputStream();
+            return finalConnection.getInputStream();
 
         } catch(Exception e){
             System.err.println(e.getMessage());
-        }
-        return finalConnection.getInputStream();
-
-     } catch(Exception e){
-            System.err.println(e.getMessage());
             return null;
         }
-    
-
+    }
 }
 
 
