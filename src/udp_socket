@@ -1,0 +1,49 @@
+package udp_socket;
+
+import java.io.*;
+import java.net.*;
+
+public class udp_server {
+
+	public static void main(String args[]) {
+		
+		DatagramSocket sock = null;
+		
+		try {
+			
+		sock = new DatagramSocket(7777);   // Creating a server socket, parameter is local port number
+		
+		byte[] buffer = new byte[65536];
+		DatagramPacket incoming = new DatagramPacket(buffer, buffer.length);  //buffer to receive incoming data
+		
+		echo("Server socket created. Waiting for incoming data");   //wait for an incoming data
+		
+		while(true) {         //communication loop
+			
+			sock.receive(incoming);
+			byte[] data= incoming.getData();
+			String s= new String (data, 0, incoming.getLength());
+			
+			echo(incoming.getAddress().getHostAddress() + ":" + incoming.getPort() + "-" + s);   //echo the details of incoming data - client ip
+			
+			s= "OK :" + s;
+			
+			DatagramPacket dp= new DatagramPacket(s.getBytes(), s.getBytes().length, incoming.getAddress(), incoming.getPort());
+			sock.send(dp);
+		}
+		
+		
+		}
+		catch(IOException e) {
+			
+			System.err.println("IOException"+ e);
+		}
+	}
+
+	
+	private static void echo(String message) {
+		// TODO Auto-generated method stub
+		
+		System.out.println(message);
+	}
+}
