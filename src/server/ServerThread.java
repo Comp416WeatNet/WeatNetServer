@@ -28,7 +28,16 @@ public class ServerThread extends Thread{
     public ServerThread(Socket s)
     {
         this.s = s;
-        authController = new AuthController(is,os,s);
+        try
+        {
+            is = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            os = new PrintWriter(s.getOutputStream());
+            authController = new AuthController(is,os,this.s);
+        }
+        catch (IOException e)
+        {
+            System.err.println("Server Thread. Run. IO error in server thread");
+        }
     }
 
     /**
@@ -36,15 +45,6 @@ public class ServerThread extends Thread{
      */
     public void run()
     {
-        try
-        {
-            is = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            os = new PrintWriter(s.getOutputStream());
-        }
-        catch (IOException e)
-        {
-            System.err.println("Server Thread. Run. IO error in server thread");
-        }
         authController.authenticate();
  //       String token = authController.createToken();
  //       Result result = new Result(token, check);
