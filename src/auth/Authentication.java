@@ -4,6 +4,7 @@ import model.DataType;
 import model.Result;
 
 import java.io.*;
+import java.net.Socket;
 import java.util.*;
 
 public class Authentication {
@@ -19,8 +20,12 @@ public class Authentication {
     private HashMap<String, String> answerMap;
     private BufferedReader is;
     private PrintWriter os;
+    private Socket s;
 
-    public Authentication (){
+    public Authentication (BufferedReader inputStream, PrintWriter outputStream, Socket s){
+        this.is = inputStream;
+        this.os = outputStream;
+        this.s = s;
         answers = new File(this.DEFAULT_FILE_PATH);
         answerMap = new HashMap<>();
     }
@@ -30,7 +35,7 @@ public class Authentication {
         return correctAnswer.equals(answer);
     }
 
-    public void getAnswers(String username) {
+    public boolean checkUsername(String username) {
         String line;
         String question;
         String answer;
@@ -45,49 +50,70 @@ public class Authentication {
                       answer = fin.readLine();
                       answerMap.put(question, answer);
                   }
-                  return;
+                  return true;
                }
             }
-            this.disconnect("Username is not existing in the database.");
+            return  false;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
-    public void authenticate(BufferedReader inputStream, PrintWriter outputStream) {
-        this.is = inputStream;
-        this.os = outputStream;
+
+
+    public boolean authenticate() {
+
         ArrayList<String> questionList = this.toList(questions);
         Collections.shuffle(questionList);
         String username;
+        String resp;
+        DataType data;
+        try {
+            resp = is.readLine();
+            data = new DataType(resp);
+            username = "<" + data.getPayload() + ">";
+            boolean result = this.checkUsername(username);
+            if(result == false) {
+                this.disconnect("Username is not existing in the database. The connection will close now.");
+            } else {
+                return sendChallenges(questionList);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean sendChallenges(ArrayList<String> questionList){
+        Random rand = new Random();
+        int qNum = rand.nextInt(questionList.size()) + 1;
         String answer;
         String question;
         DataType resp;
         try {
-            username = is.readLine();
-            resp = new DataType(username);
-            username = "<" + resp.getPayload() + ">";
-            this.getAnswers(username);
-            for(int i=0; i<3; i++) {
+            for (int i = 0; i < qNum; i++) {
                 question = questionList.get(i);
-                DataType data = new DataType(DataType.AUTH_PHASE ,DataType.AUTH_CHALLENGE ,question);
+                DataType data = new DataType(DataType.AUTH_PHASE, DataType.AUTH_CHALLENGE, question);
                 os.println(data.getData());
                 os.flush();
                 answer = is.readLine();
-                if(answer != null) {
+                if (answer != null) {
                     resp = new DataType(answer);
                     answer = resp.getPayload();
-                    System.out.println("Client sent message to the " + Thread.currentThread().getId() + "th thread.");
+                    System.out.println("Client sent message:" + answer + "\nto the " + Thread.currentThread().getId() + "th thread.");
                     boolean check = checkAnswer(question, answer);
                     if (!check) {
                         this.disconnect("You gave the wrong answer. The connection will close now.");
-                        break;
+                        return false;
                     }
                 }
             }
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     private void disconnect(String message) {

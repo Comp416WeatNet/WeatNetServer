@@ -13,15 +13,14 @@ public class AuthController {
     private Socket s;
 
     public AuthController(BufferedReader is, PrintWriter os, Socket s) {
-        this.auth = new Authentication();
+        this.auth = new Authentication(is, os, s);
         this.is = is;
         this.os = os;
         this.s = s;
     }
 
-    public void authenticate() {
-        auth.authenticate(is, os);
-        //TODO: Add s to authenticate.
+    public boolean authenticate() {
+        return auth.authenticate();
     }
 
     public String createToken() {

@@ -45,13 +45,16 @@ public class ServerThread extends Thread{
      */
     public void run()
     {
-        authController.authenticate();
- //       String token = authController.createToken();
- //       Result result = new Result(token, check);
-//        DataType dataType = result.convertToDatatype();
-//        os.println(dataType.getData());
-//        os.flush();
-
-
+       boolean check = authController.authenticate();
+       if(check) {
+           String token = authController.createToken();
+           Result result = new Result(token, check);
+           DataType dataType = result.convertToDatatype();
+           os.println(dataType.getData());
+           os.flush();
+           // TODO Create a datasocket and send in the datasocket things to Querying controller
+           queryingController = new QueryingController(authController, is, os, this.s);
+           queryingController.startQueryingPhase();
+       }
     }
 }
