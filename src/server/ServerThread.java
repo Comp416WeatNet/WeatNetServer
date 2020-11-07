@@ -28,7 +28,7 @@ public class ServerThread extends Thread{
     public ServerThread(Socket s)
     {
         this.s = s;
-        authController = new AuthController();
+        authController = new AuthController(is,os,s);
     }
 
     /**
@@ -45,12 +45,12 @@ public class ServerThread extends Thread{
         {
             System.err.println("Server Thread. Run. IO error in server thread");
         }
-        boolean check = authController.authenticate(is, os);
-        String token = authController.createToken();
-        Result result = new Result(token, check);
-        DataType dataType = result.convertToDatatype();
-        os.println(dataType.getData());
-        os.flush();
+        authController.authenticate();
+ //       String token = authController.createToken();
+ //       Result result = new Result(token, check);
+//        DataType dataType = result.convertToDatatype();
+//        os.println(dataType.getData());
+//        os.flush();
 
 
     }

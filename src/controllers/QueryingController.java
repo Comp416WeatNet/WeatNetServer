@@ -12,9 +12,7 @@ public class QueryingController {
         this.authController = authController;
     }
 
-    public boolean authenticate(BufferedReader is, PrintWriter os) {
-        return authController.authenticate(is, os);
-    }
+
 
     public String createToken() {
         return authController.createToken();

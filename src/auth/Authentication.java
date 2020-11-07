@@ -54,7 +54,7 @@ public class Authentication {
         }
     }
 
-    public boolean authenticate(BufferedReader inputStream, PrintWriter outputStream) {
+    public void authenticate(BufferedReader inputStream, PrintWriter outputStream) {
         this.is = inputStream;
         this.os = outputStream;
         ArrayList<String> questionList = this.toList(questions);
@@ -80,14 +80,14 @@ public class Authentication {
                     System.out.println("Client sent message to the " + Thread.currentThread().getId() + "th thread.");
                     boolean check = checkAnswer(question, answer);
                     if (!check) {
-                        return check;
+                        this.disconnect("You gave the wrong answer. The connection will close now.");
+                        break;
                     }
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return true;
     }
 
     private void disconnect(String message) {
@@ -101,7 +101,7 @@ public class Authentication {
             if (is != null)
             {
                 is.close();
-                System.err.println(" Socket Input Stream Closed");
+                System.err.println("Socket Input Stream Closed");
             }
 
             if (os != null)
