@@ -48,8 +48,6 @@ public class Authentication {
                 if (line.equals(username)) {
                     while ((line = fin.readLine()) != null && !line.equals("Line end")) {
                         question = line;
-                        if (question.equals("Line end"))
-                            break;
                         answer = fin.readLine();
                         answerMap.put(question, answer);
                     }
@@ -75,7 +73,7 @@ public class Authentication {
             data = new DataType(resp);
             username = "<" + data.getPayload() + ">";
             boolean result = this.checkUsername(username);
-            if (result == false) {
+            if (!result) {
                 this.disconnect("Username is not existing in the database. The connection will close now.", false);
             } else {
                 return sendChallenges(questionList);
