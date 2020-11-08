@@ -92,4 +92,8 @@ public class DataType {
         }
         return index;
     }
+
+    public String getToken() {
+        return token;
+    }
 }

@@ -31,7 +31,7 @@ public class QueryingController {
         this.ds = ds;
         this.connection = new ConnectionOpenWeatherMap(ConnectionOpenWeatherMap.DEFAULT_BASE_URL, ConnectionOpenWeatherMap.DEFAULT_ONECALL_CONTENT);
 
-        query = new Query(this.cis, this.cos, this.cs, this.dis, this.dos, this.ds, this.connection);
+        query = new Query(this.cis, this.cos, this.cs, this.dis, this.dos, this.ds, this.connection, authController.getToken());
     }
 
 

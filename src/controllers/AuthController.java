@@ -5,6 +5,7 @@ import auth.Authentication;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
 
 public class AuthController {
     private final Authentication auth;
@@ -25,5 +26,10 @@ public class AuthController {
 
     public String createToken() {
         return auth.createToken();
+    }
+
+
+    public String getToken() {
+        return auth.getToken();
     }
 }

@@ -5,8 +5,10 @@ import model.DataType;
 import model.Result;
 import stransfer.FileServer;
 
+import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
 
 public class Query {
     private static final String DEFAULT_FILE_PATH = System.getProperty("user.dir") + "/CityList";
@@ -19,8 +21,9 @@ public class Query {
     private final PrintWriter dos;
     private final Socket ds;
     private final ConnectionOpenWeatherMap connection;
+    private String token;
 
-    public Query(BufferedReader cis, PrintWriter cos, Socket cs, BufferedReader dis, PrintWriter dos, Socket ds, ConnectionOpenWeatherMap connection) {
+    public Query(BufferedReader cis, PrintWriter cos, Socket cs, BufferedReader dis, PrintWriter dos, Socket ds, ConnectionOpenWeatherMap connection, String token) {
         this.cis = cis;
         this.cos = cos;
         this.cs = cs;
@@ -28,6 +31,7 @@ public class Query {
         this.dos = dos;
         this.ds = ds;
         this.connection = connection;
+        this.token = token;
     }
 
     public void startQuery() {
@@ -35,6 +39,11 @@ public class Query {
             String resp = cis.readLine();
             DataType dt = new DataType(resp);
             String cityName = dt.getPayload();
+            String token = dt.getToken();
+            if(!this.token.equals(token)){
+                disconnect("Token mismatch", false);
+                return;
+            }
             String[] args = cityName.split(":");
             String queryType = args[0];
             String[] cityParams = getCityParams(args[1]);
@@ -83,7 +92,7 @@ public class Query {
 
     private void disconnect(String message, boolean res) {
         Result result = new Result(message, res);
-        DataType fail = result.convertToDatatype();
+        DataType fail = result.convertToQueryDataType();
         try {
             cos.println(fail.getData());
             if (cis != null) {

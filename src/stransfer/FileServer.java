@@ -14,7 +14,7 @@ public class FileServer {
 
         //Send file
         File myFile = new File(filePath);
-            byte[] mybytearray = new byte[(int) myFile.length()];
+        byte[] mybytearray = new byte[(int) myFile.length()];
 
         FileInputStream fis = new FileInputStream(myFile);
         BufferedInputStream bis = new BufferedInputStream(fis);

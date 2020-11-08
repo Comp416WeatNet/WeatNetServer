@@ -23,6 +23,7 @@ public class Authentication {
     private final PrintWriter os;
     private final Socket s;
     private String username;
+    private String token;
     private final Random rand = new Random();
 
     public Authentication(BufferedReader inputStream, PrintWriter outputStream, Socket s) {
@@ -119,15 +120,6 @@ public class Authentication {
         return false;
     }
 
-    private void timeout(String s) {
-        try {
-            is.readLine();
-            disconnect(s, false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void disconnect(String message, boolean res) {
         Result result = new Result(message, res);
         DataType fail = result.convertToDatatype();
@@ -150,6 +142,7 @@ public class Authentication {
     public String createToken() {
         String token = String.valueOf(username.hashCode());
         token += String.valueOf(Math.abs(rand.nextInt()));
+        this.token = token;
         return token;
     }
 
@@ -157,5 +150,9 @@ public class Authentication {
         ArrayList<String> arrayList = new ArrayList<>();
         arrayList.addAll(Arrays.asList(array));
         return arrayList;
+    }
+
+    public String getToken() {
+        return this.token;
     }
 }
