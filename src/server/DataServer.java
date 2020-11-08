@@ -9,7 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class DataServer {
-    public static final int DEFAULT_DATA_SOCKET_PORT = 7001;
+    public static final int DEFAULT_DATA_SOCKET_PORT = 7002;
     private static DataServer dataServer;
     private ServerSocket serverSocket;
 

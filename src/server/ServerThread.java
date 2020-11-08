@@ -33,7 +33,7 @@ public class ServerThread extends Thread {
     public ServerThread(Socket cs) {
         this.cs = cs;
         try {
-            cs.setSoTimeout(100 * 1000);
+            this.cs.setSoTimeout(100 * 1000);
             cis = new BufferedReader(new InputStreamReader(cs.getInputStream()));
             cos = new PrintWriter(cs.getOutputStream(), true);
             authController = new AuthController(cis, cos, this.cs);
@@ -63,6 +63,9 @@ public class ServerThread extends Thread {
         String token = authController.createToken();
         Result result = new Result(token, check);
         DataType dataType = result.convertToDatatype();
+        cos.println(dataType.getData());
+        int port = DataServer.DEFAULT_DATA_SOCKET_PORT;
+        dataType = new DataType(DataType.AUTH_PHASE, DataType.AUTH_SUCCESS, "" + port);
         cos.println(dataType.getData());
         DataServer dataServer = DataServer.getDataServer();
         dataServer.setupThread(this);

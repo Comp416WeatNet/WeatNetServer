@@ -2,6 +2,7 @@ package query;
 
 import connection.ConnectionOpenWeatherMap;
 import model.DataType;
+import model.Result;
 import stransfer.FileServer;
 
 import java.io.*;
@@ -37,9 +38,19 @@ public class Query {
             String[] args = cityName.split(":");
             String queryType = args[0];
             String[] cityParams = getCityParams(args[1]);
-//            File conn = connection.buildConnection(queryType, cityParams);
-            FileServer.sendFiles(ds , System.getProperty("user.dir") + "/jsonWeatherData");
-//            System.out.println(conn);
+            File conn = connection.buildConnection(queryType, cityParams);
+            FileServer.sendFiles(cos, ds , conn.getPath());
+            if ((resp = cis.readLine()) != null){
+                dt = new DataType(resp);
+                if (dt.getType() == DataType.QUERYING_SUCCESS){
+                    System.out.println("File is successfully sent to : " + ds.getRemoteSocketAddress());
+                    disconnect("File transmission successful", true);
+                } else if(dt.getType() == DataType.QUERYING_FAIL) {
+                    System.out.println("File transmission to : "+ ds.getRemoteSocketAddress() + " failed:");
+                    disconnect("File transmission failed", false);
+                }
+
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -68,5 +79,33 @@ public class Query {
         }
 
         return params;
+    }
+
+    private void disconnect(String message, boolean res) {
+        Result result = new Result(message, res);
+        DataType fail = result.convertToDatatype();
+        try {
+            cos.println(fail.getData());
+            if (cis != null) {
+                cis.close();
+                System.err.println("The input stream of socket with the address: " + cs.getRemoteSocketAddress() + " is closed");
+            }
+
+            if (cos != null) {
+                cos.close();
+                System.err.println("The output stream of socket with the address: " + cs.getRemoteSocketAddress() + " is closed");
+            }
+
+            if (ds != null) {
+                System.err.println("The data socket with the address: " + ds.getRemoteSocketAddress() + " is closed");
+                ds.close();
+            }
+            if (cs != null) {
+                System.err.println("The data socket with the address: " + cs.getRemoteSocketAddress() + " is closed");
+                cs.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

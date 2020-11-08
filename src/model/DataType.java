@@ -8,6 +8,11 @@ public class DataType {
     public static final byte AUTH_CHALLENGE = 0x01;
     public static final byte AUTH_FAIL = 0x02;
     public static final byte AUTH_SUCCESS = 0x03;
+    public static final byte QUERYING_REPORT = 0x04;
+    public static final byte QUERYING_REQUEST = 0x05;
+    public static final byte QUERYING_TIMEOUT = 0x06;
+    public static final byte QUERYING_SUCCESS = 0x07;
+    public static final byte QUERYING_FAIL = 0x08;
 
 
     private String data;

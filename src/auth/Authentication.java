@@ -76,12 +76,12 @@ public class Authentication {
             username = "<" + data.getPayload() + ">";
             boolean result = this.checkUsername(username);
             if (result == false) {
-                this.disconnect("Username is not existing in the database. The connection will close now.");
+                this.disconnect("Username is not existing in the database. The connection will close now.", false);
             } else {
                 return sendChallenges(questionList);
             }
         } catch (SocketTimeoutException e){
-            disconnect("Server connection timed out. The connection will close now.");
+            disconnect("Server connection timed out. The connection will close now.", false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -102,17 +102,17 @@ public class Authentication {
                 if (answer != null) {
                     resp = new DataType(answer);
                     answer = resp.getPayload();
-                    System.out.println("Client sent message:" + answer + "\nto the " + Thread.currentThread().getId() + "th thread.");
+//                    System.out.println("Client sent message:" + answer + "\nto the " + Thread.currentThread().getId() + "th thread.");
                     boolean check = checkAnswer(question, answer);
                     if (!check) {
-                        this.disconnect("You gave the wrong answer. The connection will close now.");
+                        this.disconnect("You gave the wrong answer. The connection will close now.", false);
                         return false;
                     }
                 }
             }
             return true;
         } catch (SocketTimeoutException e) {
-            disconnect("Server connection timed out. The connection will close now.");
+            disconnect("Server connection timed out. The connection will close now.", false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -122,14 +122,14 @@ public class Authentication {
     private void timeout(String s) {
         try {
             is.readLine();
-            disconnect(s);
+            disconnect(s, false);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void disconnect(String message) {
-        Result result = new Result(message, false);
+    private void disconnect(String message, boolean res) {
+        Result result = new Result(message, res);
         DataType fail = result.convertToDatatype();
         try {
             os.println(fail.getData());
@@ -148,7 +148,6 @@ public class Authentication {
     }
 
     public String createToken() {
-
         String token = String.valueOf(username.hashCode());
         token += String.valueOf(Math.abs(rand.nextInt()));
         return token;

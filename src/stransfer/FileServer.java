@@ -1,18 +1,20 @@
 package stransfer;
 
+import model.DataType;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import javax.imageio.ImageIO;
 
 public class FileServer {
 
-    public static void sendFiles(Socket clientSocket, String DEFAULT_FILE_PATH) throws IOException {
+    public static void sendFiles(PrintWriter cos, Socket clientSocket, String filePath) throws IOException {
 
         //Send file
-        File myFile = new File(DEFAULT_FILE_PATH);
-        System.out.println(myFile.getPath());
-        byte[] mybytearray = new byte[(int) myFile.length()];
+        File myFile = new File(filePath);
+            byte[] mybytearray = new byte[(int) myFile.length()];
 
         FileInputStream fis = new FileInputStream(myFile);
         BufferedInputStream bis = new BufferedInputStream(fis);
@@ -33,7 +35,8 @@ public class FileServer {
         //Sending file data to the server
         os.write(mybytearray, 0, mybytearray.length);
         os.flush();
-
+        DataType dataType = new DataType(DataType.QUERYING_PHASE, DataType.QUERYING_REPORT, "" + Arrays.hashCode(mybytearray));
+        cos.println(dataType.getData());
         //Closing socket
         os.close();
         dos.close();

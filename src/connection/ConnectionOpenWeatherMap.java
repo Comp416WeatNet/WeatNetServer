@@ -7,14 +7,17 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.http.HttpResponse;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ConnectionOpenWeatherMap {
     public static final String DEFAULT_BASE_URL = "https://api.openweathermap.org";
     public static final String DEFAULT_ONECALL_CONTENT = "/data/2.5/onecall?";
+    private static final String IMAGE_URL = "https://tile.openweathermap.org/map/temp_new/0/0/0.png?appid=8f262f416d14e54162be32e01df4a202";
     private static final String API_KEY = "8f262f416d14e54162be32e01df4a202";
-    private static final String IMAGE_FILE_PATH = System.getProperty("user.dir") + "/mapImage.JPG";
+    private static final String IMAGE_FILE_PATH = System.getProperty("user.dir") + "/mapImage.png";
     private static final String JSON_FILE_PATH = System.getProperty("user.dir") + "/jsonWeatherData";
 
     private String METHOD = "GET";
@@ -36,37 +39,40 @@ public class ConnectionOpenWeatherMap {
 
     public File buildConnection(String type, String... args) {
         //Building the connection
-//        if (type.toLowerCase().equals("basic weather maps")) {
- //           File imageFile = weatherMapAPIRequest(args);
-//            return imageFile;
- //       } else {
-            String jsonData = onecallAPIRequest(args);
+        if (type.toLowerCase().equals("3")) {
+            File imageFile = weatherMapAPIRequest(args);
+            return imageFile;
+        } else if ("1245".contains(type)) {
+            String jsonData = onecallAPIRequest(type, args);
             return jsonToFile(jsonData);
-//        }
+        } else {
+            return null;
+        }
     }
 
-//    private File weatherMapAPIRequest(String[] args) {
-//        File image = null;
-//        try {
-//            HttpResponse httpResponse = null;
-//            InputStream is = httpResponse.getRawBody();
-//            BufferedImage inputStreamImage = ImageIO.read(is);
-//            image = new File("image.jpg");
-//            ImageIO.write(inputStreamImage, "jpg", image);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return image;
-//    }
+    private File weatherMapAPIRequest(String[] args) {
+        File image = null;
+        String imgURL = ConnectionOpenWeatherMap.IMAGE_URL;
+        try {
+            BufferedImage inputStreamImage = ImageIO.read(new URL(imgURL));
+            image = new File(IMAGE_FILE_PATH);
+            ImageIO.write(inputStreamImage, "png", image);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
 
     private File jsonToFile(String jsonData) {
         File file = new File(JSON_FILE_PATH);
         FileOutputStream fos= null;  // true for append mode
         try {
             file.createNewFile();
-            fos = new FileOutputStream(JSON_FILE_PATH, true);
+            fos = new FileOutputStream(JSON_FILE_PATH);
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             byte[] b= jsonData.getBytes();       //converts string into bytes
-            fos.write(b);           //writes bytes into file
+            fos.write(b);
+            fos.write(String.valueOf(timestamp).getBytes());//writes bytes into file
             fos.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -77,7 +83,7 @@ public class ConnectionOpenWeatherMap {
         return file;
     }
 
-    public String onecallAPIRequest(String... args) {
+    public String onecallAPIRequest(String type, String... args) {
         StringBuilder content = new StringBuilder();
         for (String arg : args) {
             String[] params = arg.split("-");
@@ -92,6 +98,7 @@ public class ConnectionOpenWeatherMap {
                     vals = entry.getValue();
                     data += ("&" + vars + "=" + vals);
                 }
+                data += ("&exclude=" + getExcludes(type));
                 data += ("&appid=" + API_KEY);
                 connection = new URL(data);
 
@@ -112,13 +119,20 @@ public class ConnectionOpenWeatherMap {
         return "";
     }
 
-    public String getEndpoints() {
-        return fields.toString();
+    private String getExcludes(String type) {
+        String excludes = "";
+
+        return excludes;
     }
 
-    private String buildURL() {
+//1. Current Weather forecast
+//2. Daily forecast for 7 days
+//3. Basic Weather maps
+//4. Minute forecast for 1 hour
+//5. Historical Weather for 5 days
 
-        return "";
+    public String getEndpoints() {
+        return fields.toString();
     }
 
     private InputStream readWithAccess(URL url) {
