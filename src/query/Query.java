@@ -2,6 +2,7 @@ package query;
 
 import connection.ConnectionOpenWeatherMap;
 import model.DataType;
+import stransfer.FileServer;
 
 import java.io.*;
 import java.net.Socket;
@@ -9,14 +10,14 @@ import java.net.Socket;
 public class Query {
     private static final String DEFAULT_FILE_PATH = System.getProperty("user.dir") + "/CityList";
     // COMMAND SOCKET INFO
-    private BufferedReader cis;
-    private PrintWriter cos;
-    private Socket cs;
+    private final BufferedReader cis;
+    private final PrintWriter cos;
+    private final Socket cs;
     // DATA SOCKET INFO
-    private BufferedReader dis;
-    private PrintWriter dos;
-    private Socket ds;
-    private ConnectionOpenWeatherMap connection;
+    private final BufferedReader dis;
+    private final PrintWriter dos;
+    private final Socket ds;
+    private final ConnectionOpenWeatherMap connection;
 
     public Query(BufferedReader cis, PrintWriter cos, Socket cs, BufferedReader dis, PrintWriter dos, Socket ds, ConnectionOpenWeatherMap connection) {
         this.cis = cis;
@@ -36,8 +37,9 @@ public class Query {
             String[] args = cityName.split(":");
             String queryType = args[0];
             String[] cityParams = getCityParams(args[1]);
-            String conn = connection.buildConnection(queryType, cityParams);
-            System.out.println(conn);
+//            File conn = connection.buildConnection(queryType, cityParams);
+            FileServer.sendFiles(ds , System.getProperty("user.dir") + "/jsonWeatherData");
+//            System.out.println(conn);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -51,12 +53,12 @@ public class Query {
             String line;
             while ((line = fin.readLine()) != null) {
                 line = line.toLowerCase();
-                if(line.contains(cityName)) {
+                if (line.contains(cityName)) {
                     int index = line.indexOf("lat");
-                    String latVal = line.substring(index+5, line.indexOf('}', index + 5));
+                    String latVal = line.substring(index + 5, line.indexOf('}', index + 5));
                     params[0] = "lat" + "-" + latVal;
                     index = line.indexOf("lon");
-                    String lonVal = line.substring(index+5, line.indexOf(',', index + 5));
+                    String lonVal = line.substring(index + 5, line.indexOf(',', index + 5));
                     params[1] = "lon" + "-" + lonVal;
                     break;
                 }

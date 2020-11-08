@@ -10,30 +10,29 @@ public class DataType {
     public static final byte AUTH_SUCCESS = 0x03;
 
 
-
     private String data;
-    private byte phase;
-    private byte type;
-    private int size;
+    private final byte phase;
+    private final byte type;
+    private final int size;
     private String payload;
     private String token;
 
     public DataType(String data) {
         int startIndex = findStartIndex(data);
         this.data = data;
-        Byte phase = Byte.decode(data.substring(0,1));
+        Byte phase = Byte.decode(data.substring(0, 1));
         this.phase = phase;
-        Byte type = Byte.decode(data.substring(1,2));
+        Byte type = Byte.decode(data.substring(1, 2));
         this.type = type;
-        int size = Integer.decode(data.substring(2,startIndex));
+        int size = Integer.decode(data.substring(2, startIndex));
         this.size = size;
         this.payload = data.substring(startIndex + 1);
-        if(this.phase == QUERYING_PHASE){
+        if (this.phase == QUERYING_PHASE) {
             splitToken();
         }
     }
 
-    public DataType(byte phase, byte type, String payload){
+    public DataType(byte phase, byte type, String payload) {
         this.phase = phase;
         this.type = type;
         this.size = payload.length();
@@ -45,33 +44,33 @@ public class DataType {
         this.data += this.payload;
     }
 
-    public String getData(){
+    public String getData() {
         return this.data;
     }
 
-    public int getPhase(){
+    public int getPhase() {
         return this.phase;
     }
 
-    public int getType(){
+    public int getType() {
         return this.type;
     }
 
-    public String getPayload(){
+    public String getPayload() {
         return this.payload;
     }
 
     private void splitToken() {
         int index = findTokenIndex(this.payload);
         token = payload.substring(0, index);
-        payload = payload.substring(index+1);
+        payload = payload.substring(index + 1);
     }
 
     private int findStartIndex(String data) {
         char[] chArray = data.toCharArray();
         int index = 0;
-        for (char ch : chArray){
-            if(String.valueOf(ch).equals("ø"))
+        for (char ch : chArray) {
+            if (String.valueOf(ch).equals("ø"))
                 break;
             index++;
         }
@@ -81,8 +80,8 @@ public class DataType {
     private int findTokenIndex(String data) {
         char[] chArray = data.toCharArray();
         int index = 0;
-        for (char ch : chArray){
-            if(String.valueOf(ch).equals("@"))
+        for (char ch : chArray) {
+            if (String.valueOf(ch).equals("@"))
                 break;
             index++;
         }

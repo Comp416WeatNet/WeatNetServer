@@ -5,11 +5,12 @@ import model.Result;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.*;
 
 public class Authentication {
     private static final String DEFAULT_FILE_PATH = System.getProperty("user.dir") + "/SecurityAnswers";
-    private static final String[] questions = new String[] {
+    private static final String[] questions = new String[]{
             "What is your favorite color?",
             "In which city, you were born?",
             "What is your mother's name?",
@@ -17,18 +18,18 @@ public class Authentication {
     };
     private BufferedReader fin;
     private static File answers;
-    private HashMap<String, String> answerMap;
-    private BufferedReader is;
-    private PrintWriter os;
-    private Socket s;
+    private final HashMap<String, String> answerMap;
+    private final BufferedReader is;
+    private final PrintWriter os;
+    private final Socket s;
     private String username;
-    private Random rand = new Random();
+    private final Random rand = new Random();
 
-    public Authentication (BufferedReader inputStream, PrintWriter outputStream, Socket s){
+    public Authentication(BufferedReader inputStream, PrintWriter outputStream, Socket s) {
         this.is = inputStream;
         this.os = outputStream;
         this.s = s;
-        answers = new File(this.DEFAULT_FILE_PATH);
+        answers = new File(DEFAULT_FILE_PATH);
         answerMap = new HashMap<>();
     }
 
@@ -44,18 +45,18 @@ public class Authentication {
         try {
             fin = new BufferedReader(new FileReader(answers));
             while ((line = fin.readLine()) != null) {
-               if(line.equals(username)) {
-                   while((line = fin.readLine()) != null && !line.equals("Line end")) {
-                      question = line;
-                      if(question.equals("Line end"))
-                          break;
-                      answer = fin.readLine();
-                      answerMap.put(question, answer);
-                  }
-                  return true;
-               }
+                if (line.equals(username)) {
+                    while ((line = fin.readLine()) != null && !line.equals("Line end")) {
+                        question = line;
+                        if (question.equals("Line end"))
+                            break;
+                        answer = fin.readLine();
+                        answerMap.put(question, answer);
+                    }
+                    return true;
+                }
             }
-            return  false;
+            return false;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -74,18 +75,20 @@ public class Authentication {
             data = new DataType(resp);
             username = "<" + data.getPayload() + ">";
             boolean result = this.checkUsername(username);
-            if(result == false) {
+            if (result == false) {
                 this.disconnect("Username is not existing in the database. The connection will close now.");
             } else {
                 return sendChallenges(questionList);
             }
+        } catch (SocketTimeoutException e){
+            disconnect("Server connection timed out. The connection will close now.");
         } catch (IOException e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    private boolean sendChallenges(ArrayList<String> questionList){
+    private boolean sendChallenges(ArrayList<String> questionList) {
         int qNum = rand.nextInt(questionList.size()) + 1;
         String answer;
         String question;
@@ -108,10 +111,21 @@ public class Authentication {
                 }
             }
             return true;
+        } catch (SocketTimeoutException e) {
+            disconnect("Server connection timed out. The connection will close now.");
         } catch (IOException e) {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private void timeout(String s) {
+        try {
+            is.readLine();
+            disconnect(s);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void disconnect(String message) {
@@ -119,17 +133,14 @@ public class Authentication {
         DataType fail = result.convertToDatatype();
         try {
             os.println(fail.getData());
-            os.println("Closing the connection");
-            if (is != null)
-            {
+            if (is != null) {
                 is.close();
-                System.err.println("Socket Input Stream Closed");
+                System.err.println("The input stream of socket with the address: " + s.getRemoteSocketAddress() + " is closed");
             }
 
-            if (os != null)
-            {
+            if (os != null) {
                 os.close();
-                System.err.println("Socket Out Closed");
+                System.err.println("The output stream of socket with the address: " + s.getRemoteSocketAddress() + " is closed");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -143,11 +154,9 @@ public class Authentication {
         return token;
     }
 
-    public ArrayList<String> toList(String[] array){
+    public ArrayList<String> toList(String[] array) {
         ArrayList<String> arrayList = new ArrayList<>();
-        for (String element : array){
-            arrayList.add(element);
-        }
+        arrayList.addAll(Arrays.asList(array));
         return arrayList;
     }
 }

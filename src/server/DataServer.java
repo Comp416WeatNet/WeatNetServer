@@ -1,6 +1,5 @@
 package server;
 
-import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,15 +13,11 @@ public class DataServer {
     private static DataServer dataServer;
     private ServerSocket serverSocket;
 
-    private DataServer(int port)
-    {
-        try
-        {
+    private DataServer(int port) {
+        try {
             serverSocket = new ServerSocket(port);
             System.out.println("Opened up a data server socket on " + Inet4Address.getLocalHost());
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Server class.Constructor exception on oppening a server socket");
         }
@@ -34,16 +29,15 @@ public class DataServer {
         return dataServer;
     }
 
-    public void setupThread(ServerThread st){
+    public void setupThread(ServerThread st) {
         Socket ds;
         try {
             ds = serverSocket.accept();
             System.out.println("A data connection was established with a client on the address of " + ds.getRemoteSocketAddress());
             BufferedReader dis = new BufferedReader(new InputStreamReader(ds.getInputStream()));
-            PrintWriter dos = new PrintWriter(ds.getOutputStream(),true);
+            PrintWriter dos = new PrintWriter(ds.getOutputStream(), true);
             st.createDataConnection(dis, dos, ds);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Server Class.Connection establishment error inside listen and accept function");
         }

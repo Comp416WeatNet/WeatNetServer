@@ -7,10 +7,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class AuthController {
-    private Authentication auth;
-    private BufferedReader is;
-    private PrintWriter os;
-    private Socket s;
+    private final Authentication auth;
+    private final BufferedReader is;
+    private final PrintWriter os;
+    private final Socket s;
 
     public AuthController(BufferedReader is, PrintWriter os, Socket s) {
         this.auth = new Authentication(is, os, s);

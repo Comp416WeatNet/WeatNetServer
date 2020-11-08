@@ -1,6 +1,5 @@
 package main;
 
-import connection.ConnectionOpenWeatherMap;
 import server.Server;
 
 public class Main {

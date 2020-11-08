@@ -9,17 +9,17 @@ import java.net.Socket;
 
 public class QueryingController {
     // COMMAND SOCKET INFO
-    private BufferedReader cis;
-    private PrintWriter cos;
-    private Socket cs;
+    private final BufferedReader cis;
+    private final PrintWriter cos;
+    private final Socket cs;
     // DATA SOCKET INFO
-    private BufferedReader dis;
-    private PrintWriter dos;
-    private Socket ds;
+    private final BufferedReader dis;
+    private final PrintWriter dos;
+    private final Socket ds;
 
-    private AuthController authController;
-    private Query query;
-    private ConnectionOpenWeatherMap connection;
+    private final AuthController authController;
+    private final Query query;
+    private final ConnectionOpenWeatherMap connection;
 
     public QueryingController(AuthController authController, BufferedReader cis, PrintWriter cos, Socket cs, BufferedReader dis, PrintWriter dos, Socket ds) {
         this.authController = authController;
