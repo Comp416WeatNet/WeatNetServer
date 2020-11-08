@@ -8,6 +8,7 @@ import java.net.Socket;
 public class Server {
     private ServerSocket serverSocket;
     public static final int DEFAULT_SERVER_PORT = 7000;
+    public static final int DEFAULT_DATA_SOCKET_PORT = 7001;
 
     public Server(int port)
     {
@@ -37,7 +38,6 @@ public class Server {
                 ServerThread st = new ServerThread(s);
                 st.start();
         }
-
         catch (Exception e) {
             e.printStackTrace();
             System.err.println("Server Class.Connection establishment error inside listen and accept function");

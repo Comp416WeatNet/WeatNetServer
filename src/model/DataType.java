@@ -16,6 +16,7 @@ public class DataType {
     private byte type;
     private int size;
     private String payload;
+    private String token;
 
     public DataType(String data) {
         int startIndex = findStartIndex(data);
@@ -26,7 +27,10 @@ public class DataType {
         this.type = type;
         int size = Integer.decode(data.substring(2,startIndex));
         this.size = size;
-        this.payload = data.substring(startIndex);
+        this.payload = data.substring(startIndex + 1);
+        if(this.phase == QUERYING_PHASE){
+            splitToken();
+        }
     }
 
     public DataType(byte phase, byte type, String payload){
@@ -37,6 +41,7 @@ public class DataType {
         this.data = Byte.toString(this.phase);
         this.data += Byte.toString(this.type);
         this.data += Integer.toString(this.size);
+        this.data += "ø";
         this.data += this.payload;
     }
 
@@ -56,11 +61,28 @@ public class DataType {
         return this.payload;
     }
 
+    private void splitToken() {
+        int index = findTokenIndex(this.payload);
+        token = payload.substring(0, index);
+        payload = payload.substring(index+1);
+    }
+
     private int findStartIndex(String data) {
         char[] chArray = data.toCharArray();
         int index = 0;
         for (char ch : chArray){
-            if(!Character.isDigit(ch))
+            if(String.valueOf(ch).equals("ø"))
+                break;
+            index++;
+        }
+        return index;
+    }
+
+    private int findTokenIndex(String data) {
+        char[] chArray = data.toCharArray();
+        int index = 0;
+        for (char ch : chArray){
+            if(String.valueOf(ch).equals("@"))
                 break;
             index++;
         }

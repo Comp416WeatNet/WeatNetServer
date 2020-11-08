@@ -9,30 +9,38 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.Inet4Address;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerThread extends Thread{
-    protected BufferedReader is;
-    protected PrintWriter os;
-    protected Socket s;
+    private BufferedReader cis;
+    private PrintWriter cos;
+    private Socket cs;
+
+    private BufferedReader dis;
+    private PrintWriter dos;
+    private Socket ds;
+
     private String line = new String();
     private String lines = new String();
+    private ServerSocket dataSocket;
     private AuthController authController;
     private QueryingController queryingController;
 
     /**
      * Creates a server thread on the input socket
      *
-     * @param s input socket to create a thread on
+     * @param cs input socket to create a thread on
      */
-    public ServerThread(Socket s)
+    public ServerThread(Socket cs)
     {
-        this.s = s;
+        this.cs = cs;
         try
         {
-            is = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            os = new PrintWriter(s.getOutputStream());
-            authController = new AuthController(is,os,this.s);
+            cis = new BufferedReader(new InputStreamReader(cs.getInputStream()));
+            cos = new PrintWriter(cs.getOutputStream(),true);
+            authController = new AuthController(cis, cos,this.cs);
         }
         catch (IOException e)
         {
@@ -46,15 +54,28 @@ public class ServerThread extends Thread{
     public void run()
     {
        boolean check = authController.authenticate();
-       if(check) {
-           String token = authController.createToken();
-           Result result = new Result(token, check);
-           DataType dataType = result.convertToDatatype();
-           os.println(dataType.getData());
-           os.flush();
-           // TODO Create a datasocket and send in the datasocket things to Querying controller
-           queryingController = new QueryingController(authController, is, os, this.s);
-           queryingController.startQueryingPhase();
+       if (check) {
+           createDataSocket(check);
+           getQuery();
        }
     }
+
+    public void createDataConnection(BufferedReader dis, PrintWriter dos, Socket ds) {
+        this.dis = dis;
+        this.dos = dos;
+        this.ds = ds;
+    }
+    private void createDataSocket(boolean check){
+            String token = authController.createToken();
+            Result result = new Result(token, check);
+            DataType dataType = result.convertToDatatype();
+            cos.println(dataType.getData());
+            DataServer dataServer = DataServer.getDataServer();
+            dataServer.setupThread(this);
+    }
+    private void getQuery(){
+        queryingController = new QueryingController(authController, cis, cos , cs, dis, dos, ds);
+        queryingController.startQueryingPhase();
+    }
+
 }

@@ -21,6 +21,8 @@ public class Authentication {
     private BufferedReader is;
     private PrintWriter os;
     private Socket s;
+    private String username;
+    private Random rand = new Random();
 
     public Authentication (BufferedReader inputStream, PrintWriter outputStream, Socket s){
         this.is = inputStream;
@@ -60,13 +62,11 @@ public class Authentication {
         return false;
     }
 
-
-
     public boolean authenticate() {
 
         ArrayList<String> questionList = this.toList(questions);
         Collections.shuffle(questionList);
-        String username;
+
         String resp;
         DataType data;
         try {
@@ -86,7 +86,6 @@ public class Authentication {
     }
 
     private boolean sendChallenges(ArrayList<String> questionList){
-        Random rand = new Random();
         int qNum = rand.nextInt(questionList.size()) + 1;
         String answer;
         String question;
@@ -96,7 +95,6 @@ public class Authentication {
                 question = questionList.get(i);
                 DataType data = new DataType(DataType.AUTH_PHASE, DataType.AUTH_CHALLENGE, question);
                 os.println(data.getData());
-                os.flush();
                 answer = is.readLine();
                 if (answer != null) {
                     resp = new DataType(answer);
@@ -122,8 +120,6 @@ public class Authentication {
         try {
             os.println(fail.getData());
             os.println("Closing the connection");
-            os.flush();
-
             if (is != null)
             {
                 is.close();
@@ -141,7 +137,10 @@ public class Authentication {
     }
 
     public String createToken() {
-        return "token 123";
+
+        String token = String.valueOf(username.hashCode());
+        token += String.valueOf(Math.abs(rand.nextInt()));
+        return token;
     }
 
     public ArrayList<String> toList(String[] array){
